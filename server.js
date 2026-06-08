@@ -7,22 +7,17 @@ app.use(cors());
 app.use(express.json());
 
 const BOT_TOKEN = '8628012079:AAH_OXAydeiMctcCdckNa8tvGzKklPdiwRs';
-// ==============================================================
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// Store OTPs temporarily
 const otpStore = new Map();
 const userChatIds = new Map();
 
-// Generate 6-digit code
 function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// ========== BOT COMMANDS ==========
 
-// When user starts the bot
 bot.start(async (ctx) => {
     await ctx.reply('🔐 Welcome to TradeHub Verification Bot!\n\nPlease share your phone number to continue.', {
         reply_markup: {
@@ -36,7 +31,6 @@ bot.start(async (ctx) => {
     });
 });
 
-// When user shares phone number
 bot.on('contact', async (ctx) => {
     const contact = ctx.message.contact;
     const phoneNumber = contact.phone_number;
@@ -47,9 +41,7 @@ bot.on('contact', async (ctx) => {
     await ctx.reply(`✅ Phone number ${phoneNumber} registered!\n\nYou can now verify on the TradeHub website.`);
 });
 
-// ========== API ENDPOINTS FOR YOUR WEBSITE ==========
 
-// Send OTP
 app.post('/api/send-otp', async (req, res) => {
     const { phoneNumber } = req.body;
     
@@ -77,7 +69,6 @@ app.post('/api/send-otp', async (req, res) => {
     }
 });
 
-// Verify OTP
 app.post('/api/verify-otp', (req, res) => {
     const { phoneNumber, otp } = req.body;
     
@@ -100,7 +91,6 @@ app.post('/api/verify-otp', (req, res) => {
     res.json({ success: true, message: "Phone verified successfully!" });
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
@@ -108,3 +98,10 @@ app.listen(PORT, () => {
 
 bot.launch();
 console.log('Bot is running...');
+const { Telegraf } = require('telegraf');
+
+console.log("Token length check:", process.env.BOT_TOKEN ? process.env.BOT_TOKEN.length : "UNDEFINED");
+
+const bot = new Telegraf(process.env.BOT_TOKEN);
+
+bot.launch();
