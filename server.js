@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
+const BOT_TOKEN = process.env.BOT_TOKEN || '8628012079:AAHWLsBa7mZwomiPLFZstNrMFomXjQMOjIs';
 const bot = new Telegraf(BOT_TOKEN);
 
 const otpStore = new Map();
@@ -16,7 +16,6 @@ function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Simple /start - just asks for phone
 bot.start(async (ctx) => {
     await ctx.reply('Share your phone number to continue:', {
         reply_markup: {
@@ -30,22 +29,19 @@ bot.start(async (ctx) => {
     });
 });
 
-// When user shares phone
 bot.on('contact', async (ctx) => {
     const phoneNumber = ctx.message.contact.phone_number;
     const chatId = ctx.chat.id;
-    
     userChatIds.set(phoneNumber, chatId);
     await ctx.reply(`✅ Phone ${phoneNumber} registered. Get code from website.`);
 });
 
-// Send OTP endpoint
 app.post('/api/send-otp', async (req, res) => {
     const { phoneNumber } = req.body;
     const chatId = userChatIds.get(phoneNumber);
     
     if (!chatId) {
-        return res.json({ success: false, message: "Please message @TradeHubBot first" });
+        return res.json({ success: false, message: "Please start the bot first" });
     }
     
     const otp = generateOTP();
@@ -59,7 +55,6 @@ app.post('/api/send-otp', async (req, res) => {
     }
 });
 
-// Verify OTP endpoint
 app.post('/api/verify-otp', (req, res) => {
     const { phoneNumber, otp } = req.body;
     const stored = otpStore.get(phoneNumber);
@@ -74,5 +69,6 @@ app.post('/api/verify-otp', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server on port ${PORT}`));
+
 bot.launch();
 console.log('Bot running');
