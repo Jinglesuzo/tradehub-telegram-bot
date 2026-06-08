@@ -1,14 +1,16 @@
 const { Telegraf } = require('telegraf');
 const http = require('http');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; 
+const HOST = '0.0.0.0';
+
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('TradeHub Telegram Bot is Online\n');
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Web server listening on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`Web server successfully bound to ${HOST}:${PORT}`);
 });
 
 console.log("Token length check:", process.env.BOT_TOKEN ? process.env.BOT_TOKEN.length : "UNDEFINED");
