@@ -1,22 +1,34 @@
 const { Telegraf } = require('telegraf');
 const http = require('http');
 
-// 1. Dummy Web Server to satisfy Render's port requirement
 const PORT = process.env.PORT || 3000;
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Bot is running\n');
-});
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Dummy server listening on port ${PORT}`);
+  res.end('TradeHub Telegram Bot is Online\n');
 });
 
-// 2. Your Telegraf Bot Logic
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Web server listening on port ${PORT}`);
+});
+
 console.log("Token length check:", process.env.BOT_TOKEN ? process.env.BOT_TOKEN.length : "UNDEFINED");
 
+if (!process.env.BOT_TOKEN) {
+  console.error("FATAL ERROR: BOT_TOKEN is missing in Render environment variables!");
+  process.exit(1);
+}
+
 const bot = new Telegraf(process.env.BOT_TOKEN);
+
 bot.start((ctx) => ctx.reply('Bot started!'));
-bot.launch();
+
+bot.catch((err, ctx) => {
+  console.error(`Telegraf error for ${ctx.updateType}:`, err);
+});
+
+bot.launch()
+  .then(() => console.log('Telegram Bot successfully connected to Telegram API!'))
+  .catch((err) => console.error('Failed to launch Telegram Bot:', err));
 
 process.once('SIGINT', () => {
   bot.stop('SIGINT');
