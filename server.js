@@ -72,3 +72,4 @@ app.listen(PORT, () => console.log(`Server on port ${PORT}`));
 
 bot.launch();
 console.log('Bot running');
+app.get('/ping', (req, res) => res.json({ status: "alive" }));
